@@ -24,6 +24,22 @@
   return parser.attributedString;
 }
 
++ (BOOL)setLabelAttributedString:(UILabel*)label fromMush:(NSString*)markdown {
+    MGMushParser *parser = [[MGMushParser alloc] init];
+    parser.mush = markdown;
+    parser.baseColor = label.textColor;
+    parser.baseFont = label.font;
+    if ([label respondsToSelector:@selector(attributedText)]) {
+        [parser parse];
+        label.attributedText = parser.attributedString;
+        return YES;
+    }
+
+    [parser strip];
+    label.text = parser.string;
+    return NO;
+}
+
 - (void)parse {
 
   // apply base colour and font
