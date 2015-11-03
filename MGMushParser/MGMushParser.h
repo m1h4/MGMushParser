@@ -2,6 +2,7 @@
 //  Created by matt on 7/11/12.
 //
 
+#import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
 
 /**
@@ -33,11 +34,16 @@ Use `MGMushParser` to create an `NSAttributedString` from an `NSString` with lig
                                             font:(UIFont *)font
                                            color:(UIColor *)color;
 
++ (BOOL)setLabelAttributedString:(UILabel*)label fromMush:(NSString*)markdown;
+
 @property (nonatomic, copy) NSString *mush;
 @property (nonatomic, retain) UIFont *baseFont;
 @property (nonatomic, retain) UIColor *baseColor;
+
 - (void)parse;
 - (void)strip;
+
 - (NSAttributedString *)attributedString;
+- (NSString *)string;
 
 @end

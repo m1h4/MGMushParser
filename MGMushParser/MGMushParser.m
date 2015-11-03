@@ -173,6 +173,30 @@
   [self applyParser:kerningParser];
 }
 
++ (UIFont *)systemFontOfSize:(CGFloat)size thickness:(NSString *)thickness {
+    id mapWeight = @{@"@Thin": @(UIFontWeightThin),
+                     @"@Light": @(UIFontWeightLight),
+                     @"@Regular": @(UIFontWeightRegular),
+                     @"@Medium": @(UIFontWeightMedium),
+                     @"@Bold": @(UIFontWeightBold)};
+
+    id mapFonts = @{@"@Thin": @"HelveticaNeue-Thin",
+                    @"@Light": @"HelveticaNeue-Light",
+                    @"@Regular": @"HelveticaNeue",
+                    @"@Medium": @"HelveticaNeue-Medium",
+                    @"@Bold": @"HelveticaNeue-Bold"};
+
+    if ([self respondsToSelector:@selector(systemFontOfSize:weight:)]) {
+        CGFloat weight = [mapWeight[thickness] floatValue];
+
+        return [UIFont systemFontOfSize:size weight:weight];
+    }
+
+    NSString *fontName = mapFonts[thickness];
+
+    return [UIFont fontWithName:fontName size:size];
+}
+
 - (void)applyParser:(NSDictionary *)parser {
   id regex = [NSRegularExpression regularExpressionWithPattern:parser[@"regex"]
       options:0 error:nil];
@@ -217,13 +241,14 @@
                   [substrs[[attributes[attributeName] intValue]] isKindOfClass:NSAttributedString.class]) {
                   NSString *fontString = [substrs[[attributes[attributeName] intValue]] string];
                   NSArray *components = [fontString componentsSeparatedByString:@","];
+                  NSString *fontName = components[0];
+                  CGFloat size = self.baseFont.pointSize;
                   if (components.count == 2) {
-                      NSString *fontName = components[0];
-                      CGFloat size = [components[1] doubleValue];
-                      UIFont *font = [UIFont fontWithName:fontName size:size];
-                      if (font) {
-                          attributesCopy[attributeName] = font;
-                      }
+                      size = [components[1] doubleValue];
+                  }
+                  UIFont *font = [fontName characterAtIndex:0] == '@' ? [MGMushParser systemFontOfSize:size thickness:fontName] : [UIFont fontWithName:fontName size:size];
+                  if (font) {
+                      attributesCopy[attributeName] = font;
                   }
               }
 
@@ -323,6 +348,10 @@
 
 - (NSAttributedString *)attributedString {
   return working;
+}
+
+- (NSString *)string {
+    return working.string;
 }
 
 #pragma mark - Font Caches
